@@ -9,10 +9,12 @@ using UnityEngine;
 public class GraphSO : ScriptableObject
 {
     [HideInInspector]
-    public int NumOfVertices = 0;
-    [HideInInspector]
     public List<Vertex> Vertices = new List<Vertex>();
     public List<List<Tuple<Vertex, int>>> Adjacency = new List<List<Tuple<Vertex, int>>>();
+
+    public int NumOfVertices { get => _numOVertices; set => _numOVertices = value; }
+
+    private int _numOVertices = 0;
 
     #region Add Vertex/Edge
     public Vertex AddVertex()
@@ -114,7 +116,6 @@ public class GraphSO : ScriptableObject
         while (minV != null)
         {
             stack.Push(minV);
-            //Debug.Log(minV.Id);
             minV = prevVertex[minV];
         }
 
@@ -143,19 +144,4 @@ public class GraphSO : ScriptableObject
         Adjacency.Clear();
     }
     #endregion
-
-    /*
-private void OnValidate()
-{
-    var allVertices = FindObjectsOfType<VertexGO>();
-    if (allVertices.Length != _vertices.Count)
-    {
-        for (int i = allVertices.Length-1; i >= 0; i--)
-        {
-            var v = allVertices[i];
-            Destroy(v);
-        }
-    }
-}
-*/
 }

@@ -6,8 +6,8 @@ using System.Text;
 [CustomEditor(typeof(VertexGO))]
 public class VertexGOEditor : Editor
 {
-    VertexGO selectedVertexGO;
-    int weight;
+    private VertexGO _selectedVertexGO;
+    private int _weight;
 
     void OnSceneGUI()
     {
@@ -31,11 +31,11 @@ public class VertexGOEditor : Editor
         GUILayout.BeginArea(new Rect(10, 10, 200, 100), boxStyle);
 
         GUILayout.Label("Add edge");
-        selectedVertexGO = (VertexGO)EditorGUILayout.ObjectField("Neighbour", selectedVertexGO, typeof(VertexGO), allowSceneObjects: true);
-        weight = EditorGUILayout.IntField("Weight", weight);
+        _selectedVertexGO = (VertexGO)EditorGUILayout.ObjectField("Neighbour", _selectedVertexGO, typeof(VertexGO), allowSceneObjects: true);
+        _weight = EditorGUILayout.IntField("Weight", _weight);
         if (GUILayout.Button("Create"))
         {
-            graph.AddEdge(vertex, selectedVertexGO, weight);
+            graph.AddEdge(vertex, _selectedVertexGO, _weight);
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Keyboard));
             StringBuilder sb = new StringBuilder();
             sb.Append("\n");
@@ -46,21 +46,9 @@ public class VertexGOEditor : Editor
             Debug.Log(sb.ToString());
         }
 
-        /*var graphSO = new SerializedObject(graph.graph);
-        var edges = graphSO.FindProperty("Adjacency");
-        if (edges.arraySize > 0)
-        {
-            EditorGUILayout.PropertyField(edges, new GUIContent("List of edges"), true);
-        }*/
-
         GUILayout.EndArea();
 
         Handles.EndGUI();
-        /*Vector3 mousePos = Event.current.mousePosition;
-        Ray ray = HandleUtility.GUIPointToWorldRay(mousePos);
-        mousePos = ray.origin;
-        Handles.DrawLine(vertex.transform.position, mousePos);*/
-
     }
 
     public override void OnInspectorGUI()

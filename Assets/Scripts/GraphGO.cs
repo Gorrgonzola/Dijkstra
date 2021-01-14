@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
 public class GraphGO : MonoBehaviour
 {
+    #region Fields/Properties
     [SerializeField]
     private VertexGO _vertexGraphics = null;
     [SerializeField]
@@ -20,7 +18,7 @@ public class GraphGO : MonoBehaviour
     private Dictionary<Vertex, VertexGO> _verticesGO = new Dictionary<Vertex, VertexGO>();
     private LineRenderer _pathGraphics;
     private Vertex[] _path;
-
+    #endregion
 
     private void OnEnable()
     {
@@ -33,18 +31,9 @@ public class GraphGO : MonoBehaviour
         }
 
         DeleteAllVertices();
-        /*if (Graph != null)
-        {
-            foreach (var v in Graph.Vertices)
-            {
-                var vGo = Instantiate(_vertexGraphics, transform.position, Quaternion.identity, transform);
-                vGo.name = Graph.NumOfVertices.ToString();
-                vGo.Vertex = v;
-                _verticesGO.Add(vGo.Vertex, vGo);
-            }
-        }*/
     }
 
+    #region Add Edge/Vertex
     public void AddEdge(VertexGO v1, VertexGO v2, int weight)
     {
         if (Graph.Adjacency[v1.Vertex.Id].Any(e => e.Item1 == v2.Vertex))
@@ -70,6 +59,7 @@ public class GraphGO : MonoBehaviour
         vGo.Vertex = Graph.AddVertex();
         _verticesGO.Add(vGo.Vertex, vGo);
     }
+    #endregion
 
     #region Drawing
     private void OnDrawGizmos()

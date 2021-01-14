@@ -59,22 +59,10 @@ public class GraphGOEditor : Editor
         if (GUILayout.Button("Find Shortest Path"))
         {
             var path = graph.FindShortestPath(_start, _end);
-            
+
             if (path != null)
             {
                 graph.DrawShortestPath(path);
-                
-                /*StringBuilder pathStr = new StringBuilder();
-                pathStr.Append($"Shortest path with distance {_end.Vertex.TentativeDist}:\n");
-                while (path.Count > 0)
-                {
-                    var v = path.Pop();
-                    pathStr.Append($"{v.Id}->");
-
-                    lr.SetPosition(i, graph.verticesGO[v].transform.position);
-                    i++;
-                }
-                Debug.Log(pathStr.ToString());*/
             }
         }
     }
