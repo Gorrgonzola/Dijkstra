@@ -62,7 +62,7 @@ public class GraphGOEditor : Editor
 
             if (path != null)
             {
-                graph.DrawShortestPath(path);
+                graph.SetShortestPath(path);
             }
         }
     }

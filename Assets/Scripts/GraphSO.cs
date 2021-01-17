@@ -37,24 +37,14 @@ public class GraphSO : ScriptableObject
             return;
         }
 
-        var oldEdgeValue = Adjacency[v1.Id].Where(e => e.Item1 == v2).FirstOrDefault();
-        if (oldEdgeValue != null)
-        {
-            Adjacency[v1.Id].Remove(oldEdgeValue);
-        }
-        oldEdgeValue = Adjacency[v2.Id].Where(e => e.Item1 == v1).FirstOrDefault();
-        if (oldEdgeValue != null)
-        {
-            Adjacency[v2.Id].Remove(oldEdgeValue);
-        }
+        Adjacency[v1.Id].RemoveAll(e => e.Item1 == v2);
+        Adjacency[v2.Id].RemoveAll(e => e.Item1 == v1);
 
         Adjacency[v1.Id].Add(new Tuple<Vertex, int>(v2, weight));
         Adjacency[v2.Id].Add(new Tuple<Vertex, int>(v1, weight));
 
         Adjacency[v1.Id].Sort((x1, x2) => x2.Item1.Id - x1.Item1.Id);
         Adjacency[v2.Id].Sort((x1, x2) => x2.Item1.Id - x1.Item1.Id);
-
-        Debug.Log("Edge created");
     }
     #endregion
 
@@ -123,20 +113,6 @@ public class GraphSO : ScriptableObject
     }
 
     #region Deletion
-    public void DeleteVertex(Vertex v)
-    {
-        Vertices.Remove(v);
-        Adjacency.RemoveAt(v.Id);
-        foreach (var adj in Adjacency)
-        {
-            foreach (var edge in adj)
-            {
-                if (edge.Item1 == v)
-                    adj.Remove(edge);
-            }
-        }
-    }
-
     public void DeleteAllVertices()
     {
         NumOfVertices = 0;

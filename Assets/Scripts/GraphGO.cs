@@ -12,10 +12,8 @@ public class GraphGO : MonoBehaviour
     private GraphSO _graph = null;
 
     public GraphSO Graph { get => _graph; set => _graph = value; }
-    public Dictionary<Vertex, VertexGO> VerticesGO { get => _verticesGO; set => _verticesGO = value; }
+    public Dictionary<Vertex, VertexGO> VerticesGO { get; set; } = new Dictionary<Vertex, VertexGO>();
 
-
-    private Dictionary<Vertex, VertexGO> _verticesGO = new Dictionary<Vertex, VertexGO>();
     private LineRenderer _pathGraphics;
     private Vertex[] _path;
     #endregion
@@ -55,9 +53,9 @@ public class GraphGO : MonoBehaviour
     public void AddVertex()
     {
         var vGo = Instantiate(_vertexGraphics, transform.position, Quaternion.identity, transform);
-        vGo.name = Graph.NumOfVertices.ToString();
         vGo.Vertex = Graph.AddVertex();
-        _verticesGO.Add(vGo.Vertex, vGo);
+        vGo.name = vGo.Vertex.Id.ToString();
+        VerticesGO.Add(vGo.Vertex, vGo);
     }
     #endregion
 
@@ -67,29 +65,31 @@ public class GraphGO : MonoBehaviour
         DrawEdges();
         if (_path != null)
         {
-            _pathGraphics.positionCount = _path.Length;
-            _pathGraphics.startColor = Color.blue;
-            _pathGraphics.endColor = Color.red;
-            int i = 0;
-            while (i < _path.Length)
-            {
-                var v = _path[i];
-
-                _pathGraphics.SetPosition(i, _verticesGO[v].transform.position);
-                i++;
-            }
+            DrawShortestPath();
         }
     }
 
-    public void DrawShortestPath(Stack<Vertex> path)
+    private void DrawShortestPath()
+    {
+        _pathGraphics.positionCount = _path.Length;
+        _pathGraphics.startColor = Color.blue;
+        _pathGraphics.endColor = Color.red;
+        int i = 0;
+        while (i < _path.Length)
+        {
+            var vertex = _path[i];
+            _pathGraphics.SetPosition(i, VerticesGO[vertex].transform.position);
+            i++;
+        }
+    }
+
+    public void SetShortestPath(Stack<Vertex> path)
     {
         _path = path.ToArray();
-
-        _verticesGO[_path[0]].SetColorByType();
     }
 
     /// <summary>
-    /// Draws(very badly) lines using LineRenderer(LR). Every odd point in a LR is a transform.position
+    /// Draws(very badly) lines using LineRenderer(LR). Every even point in a LR is a transform.position
     /// </summary>
     public void DrawEdges()
     {
@@ -97,13 +97,13 @@ public class GraphGO : MonoBehaviour
             return;
         foreach (var v in Graph.Vertices)
         {
-            var vGO = _verticesGO[v];
+            var vGO = VerticesGO[v];
             int lineCount = 0;
             foreach (var edge in Graph.Adjacency[v.Id])
             {
                 if (lineCount >= vGO.EdgeGraphics.positionCount)
                     break;
-                var vNeighbourGO = _verticesGO[edge.Item1];
+                var vNeighbourGO = VerticesGO[edge.Item1];
 
                 var neighbourPos = vNeighbourGO.transform.position;
                 vGO.EdgeGraphics.SetPosition(lineCount, neighbourPos);
@@ -116,13 +116,13 @@ public class GraphGO : MonoBehaviour
 
     public void DeleteAllVertices()
     {
-        foreach (var kv in _verticesGO)
+        foreach (var kv in VerticesGO)
         {
             var vGO = kv.Value;
             if (vGO != null)
                 DestroyImmediate(vGO.gameObject);
         }
-        _verticesGO.Clear();
+        VerticesGO.Clear();
 
         Graph.DeleteAllVertices();
     }
