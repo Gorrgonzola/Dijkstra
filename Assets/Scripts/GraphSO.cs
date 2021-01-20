@@ -10,7 +10,7 @@ public class GraphSO : ScriptableObject
 {
     [HideInInspector]
     public List<Vertex> Vertices = new List<Vertex>();
-    public List<List<Tuple<Vertex, int>>> Adjacency = new List<List<Tuple<Vertex, int>>>();
+    public List<List<Edge>> Adjacency = new List<List<Edge>>();
 
     public int NumOfVertices { get => _numOVertices; set => _numOVertices = value; }
 
@@ -25,7 +25,7 @@ public class GraphSO : ScriptableObject
             Type = VertexType.NONE
         };
         Vertices.Add(v);
-        Adjacency.Add(new List<Tuple<Vertex, int>>());
+        Adjacency.Add(new List<Edge>());
         NumOfVertices++;
         return v;
     }
@@ -37,14 +37,14 @@ public class GraphSO : ScriptableObject
             return;
         }
 
-        Adjacency[v1.Id].RemoveAll(e => e.Item1 == v2);
-        Adjacency[v2.Id].RemoveAll(e => e.Item1 == v1);
+        Adjacency[v1.Id].RemoveAll(e => e.AdjacentV == v2);
+        Adjacency[v2.Id].RemoveAll(e => e.AdjacentV == v1);
 
-        Adjacency[v1.Id].Add(new Tuple<Vertex, int>(v2, weight));
-        Adjacency[v2.Id].Add(new Tuple<Vertex, int>(v1, weight));
+        Adjacency[v1.Id].Add(new Edge(v2, weight));
+        Adjacency[v2.Id].Add(new Edge(v1, weight));
 
-        Adjacency[v1.Id].Sort((x1, x2) => x2.Item1.Id - x1.Item1.Id);
-        Adjacency[v2.Id].Sort((x1, x2) => x2.Item1.Id - x1.Item1.Id);
+        Adjacency[v1.Id].Sort((x1, x2) => x2.AdjacentV.Id - x1.AdjacentV.Id);
+        Adjacency[v2.Id].Sort((x1, x2) => x2.AdjacentV.Id - x1.AdjacentV.Id);
     }
     #endregion
 
@@ -83,10 +83,10 @@ public class GraphSO : ScriptableObject
 
             foreach (var edge in Adjacency[minV.Id])
             {
-                var v = edge.Item1;
+                var v = edge.AdjacentV;
                 if (!vertexSet.Contains(v))
                     continue;
-                var dist = minV.TentativeDist + edge.Item2;
+                var dist = minV.TentativeDist + edge.Weight;
                 if (dist < v.TentativeDist)
                 {
                     v.TentativeDist = dist;

@@ -31,17 +31,36 @@ public class GraphGOEditor : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        GraphGO graph = (GraphGO)serializedObject.targetObject;
 
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Graph Editing", EditorStyles.boldLabel);
+
+        GraphGO graph = (GraphGO)serializedObject.targetObject;
+        var graphSO = graph.Graph;
+        
+        if (GUILayout.Button("Create Graph Asset"))
+        {
+            graph.CreateGraph();
+        }
+        if (GUILayout.Button("Load Graph Asset"))
+        {
+            graph.LoadGraph();
+        }
+        if (graphSO == null)
+            return;
         if (GUILayout.Button("Create Vertex"))
         {
             graph.AddVertex();
         }
+        GUILayout.Space(10);
         if (GUILayout.Button("Delete All Vertices"))
         {
             graph.DeleteAllVertices();
         }
 
+        GUILayout.Space(20);
+
+        EditorGUILayout.LabelField("Dijkstra's algorithm", EditorStyles.boldLabel);
         _start = (VertexGO)EditorGUILayout.ObjectField("Start", _start, typeof(VertexGO), allowSceneObjects: true);
         _end = (VertexGO)EditorGUILayout.ObjectField("End", _end, typeof(VertexGO), allowSceneObjects: true);
         if (_start != null && _start.Vertex != null)

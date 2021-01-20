@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System;
 using System.Text;
 
 [CustomEditor(typeof(VertexGO))]
@@ -12,7 +11,7 @@ public class VertexGOEditor : Editor
     void OnSceneGUI()
     {
         VertexGO vertex = (VertexGO)serializedObject.targetObject;
-        GraphGO graph = vertex.transform.parent?.GetComponent<GraphGO>();
+        GraphGO graph = vertex.transform.parent.GetComponent<GraphGO>();
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
 
 
@@ -41,9 +40,9 @@ public class VertexGOEditor : Editor
             sb.Append("\n");
             foreach (var edge in graph.Graph.Adjacency[vertex.Vertex.Id])
             {
-                sb.Append($"Vertex {edge.Item1.Id} with edge weight {edge.Item2}\n");
+                sb.Append($"Vertex {edge.AdjacentV.Id} with edge weight {edge.Weight}\n");
             }
-            Debug.Log(sb.ToString());
+            Debug.Log(sb.ToString(), vertex.gameObject);
         }
 
         GUILayout.EndArea();

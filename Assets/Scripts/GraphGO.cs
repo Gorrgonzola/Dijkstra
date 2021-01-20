@@ -1,40 +1,85 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
 public class GraphGO : MonoBehaviour
 {
     #region Fields/Properties
+    [Range(0, 10f)]
+    [SerializeField]
+    private float _spawnBoxBounds = 8f;
     [SerializeField]
     private VertexGO _vertexGraphics = null;
     [SerializeField]
-    private GraphSO _graph = null;
+    private LineRenderer _pathGraphics = null;
+    [Space(20)]
+    [SerializeField]
+    private GraphSO _graphToLoad = null;
 
-    public GraphSO Graph { get => _graph; set => _graph = value; }
+
+    public GraphSO Graph { get; set; }
     public Dictionary<Vertex, VertexGO> VerticesGO { get; set; } = new Dictionary<Vertex, VertexGO>();
 
-    private LineRenderer _pathGraphics;
     private Vertex[] _path;
     #endregion
 
+    #region Graph Asset Handling
     private void OnEnable()
     {
-        _pathGraphics = GetComponent<LineRenderer>();
-        _pathGraphics.positionCount = 0;
+        UnloadGraph();
+    }
+    public void CreateGraph()
+    {
+        if (Graph != null)
+            UnloadGraph();
+        GraphSO asset = ScriptableObject.CreateInstance<GraphSO>();
+        AssetDatabase.CreateAsset(asset, $"Assets/ScriptableObjects/Graph{asset.GetInstanceID()}.asset");
+        AssetDatabase.SaveAssets();
 
-        foreach (var vOldGO in GetComponentsInChildren<VertexGO>())
+        Graph = asset;
+    }
+
+    public void LoadGraph()
+    {
+        if (_graphToLoad == null)
         {
-            DestroyImmediate(vOldGO.gameObject);
+            Debug.LogError("No graph asset provided.");
+            return;
         }
 
-        DeleteAllVertices();
+        UnloadGraph();
+        Graph = _graphToLoad;
+        foreach (var v in Graph.Vertices)
+        {
+            var randOffset = new Vector3(Random.Range(-_spawnBoxBounds, _spawnBoxBounds), Random.Range(-_spawnBoxBounds, _spawnBoxBounds), Random.Range(-_spawnBoxBounds, _spawnBoxBounds));
+            var vGO = Instantiate(_vertexGraphics, transform.position + randOffset, Quaternion.identity, transform) as VertexGO;
+            vGO.Vertex = v;
+            vGO.name = v.Id.ToString();
+            v.Type = VertexType.NONE;
+            vGO.SetColorByType();
+            VerticesGO.Add(v, vGO);
+            vGO.EdgeGraphics.positionCount = Mathf.Max(0, Graph.Adjacency[v.Id].Count - v.Id) * 2;
+        }
     }
+    private void UnloadGraph()
+    {
+        foreach (var vGO in GetComponentsInChildren<VertexGO>())
+        {
+            DestroyImmediate(vGO.gameObject);
+        }
+        VerticesGO.Clear();
+        _pathGraphics.positionCount = 0;
+        _path = null;
+        Graph = null;
+    }
+    #endregion
 
     #region Add Edge/Vertex
     public void AddEdge(VertexGO v1, VertexGO v2, int weight)
     {
-        if (Graph.Adjacency[v1.Vertex.Id].Any(e => e.Item1 == v2.Vertex))
+        if (Graph.Adjacency[v1.Vertex.Id].Any(e => e.AdjacentV == v2.Vertex))
         {
             Graph.AddEdge(v1.Vertex, v2.Vertex, weight);
             return;
@@ -49,13 +94,27 @@ public class GraphGO : MonoBehaviour
         {
             v2.EdgeGraphics.positionCount += 2;
         }
+
+        EditorUtility.SetDirty(Graph);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
     }
     public void AddVertex()
     {
-        var vGo = Instantiate(_vertexGraphics, transform.position, Quaternion.identity, transform);
+        if (Graph == null)
+        {
+            Debug.LogError("Graph is null. Create or load one first.");
+            return;
+        }
+        var randOffset = new Vector3(Random.Range(-_spawnBoxBounds, _spawnBoxBounds), Random.Range(-_spawnBoxBounds, _spawnBoxBounds), Random.Range(-_spawnBoxBounds, _spawnBoxBounds));
+        var vGo = Instantiate(_vertexGraphics, transform.position + randOffset, Quaternion.identity, transform);
         vGo.Vertex = Graph.AddVertex();
         vGo.name = vGo.Vertex.Id.ToString();
         VerticesGO.Add(vGo.Vertex, vGo);
+
+        EditorUtility.SetDirty(Graph);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
     }
     #endregion
 
@@ -89,7 +148,7 @@ public class GraphGO : MonoBehaviour
     }
 
     /// <summary>
-    /// Draws(very badly) lines using LineRenderer(LR). Every even point in a LR is a transform.position
+    /// Draws(badly) lines using LineRenderer(LR). Every even point in a LR is a transform.position
     /// </summary>
     public void DrawEdges()
     {
@@ -103,7 +162,7 @@ public class GraphGO : MonoBehaviour
             {
                 if (lineCount >= vGO.EdgeGraphics.positionCount)
                     break;
-                var vNeighbourGO = VerticesGO[edge.Item1];
+                var vNeighbourGO = VerticesGO[edge.AdjacentV];
 
                 var neighbourPos = vNeighbourGO.transform.position;
                 vGO.EdgeGraphics.SetPosition(lineCount, neighbourPos);
@@ -116,6 +175,8 @@ public class GraphGO : MonoBehaviour
 
     public void DeleteAllVertices()
     {
+        if (Graph == null)
+            return;
         foreach (var kv in VerticesGO)
         {
             var vGO = kv.Value;
