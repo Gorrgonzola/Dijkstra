@@ -1,9 +1,12 @@
 ﻿using System;
+using UnityEngine;
 
 [Serializable]
 public class Edge
 {
+    [SerializeField]
     private Vertex _adjV;
+    [SerializeField]
     private int _weight;
 
     public Vertex AdjacentV => _adjV;

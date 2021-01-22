@@ -38,7 +38,7 @@ public class VertexGOEditor : Editor
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Keyboard));
             StringBuilder sb = new StringBuilder();
             sb.Append("\n");
-            foreach (var edge in graph.Graph.Adjacency[vertex.Vertex.Id])
+            foreach (var edge in graph.Graph.Adjacency[vertex.Vertex.Id].InnerList)
             {
                 sb.Append($"Vertex {edge.AdjacentV.Id} with edge weight {edge.Weight}\n");
             }

@@ -1,11 +1,21 @@
 ﻿
+using System;
 using UnityEngine;
 
+[Serializable]
 public class Vertex
-{ 
-    public float TentativeDist { get; set; } = Mathf.Infinity;
-    public int Id { get; set; }
-    public VertexType Type { get; set; } = VertexType.NONE;
+{
+    [HideInInspector]
+    [SerializeField]
+    private float tentativeDist = Mathf.Infinity;
+    [SerializeField]
+    private int id;
+    [HideInInspector]
+    [SerializeField]
+    private VertexType type = VertexType.NONE;
 
+    public float TentativeDist { get => tentativeDist; set => tentativeDist = value; }
+    public int Id { get => id; set => id = value; }
+    public VertexType Type { get => type; set => type = value; }
 
 }

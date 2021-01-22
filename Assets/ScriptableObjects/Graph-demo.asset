@@ -12,3 +12,86 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba8817aa5669d6f41bd972fd18f30afa, type: 3}
   m_Name: Graph-demo
   m_EditorClassIdentifier: 
+  Vertices:
+  - tentativeDist: 0
+    id: 0
+    type: 0
+  - tentativeDist: 0
+    id: 1
+    type: 0
+  - tentativeDist: 0
+    id: 2
+    type: 0
+  - tentativeDist: 0
+    id: 3
+    type: 0
+  - tentativeDist: 0
+    id: 4
+    type: 0
+  Adjacency:
+  - InnerList:
+    - _adjV:
+        tentativeDist: 0
+        id: 4
+        type: 0
+      _weight: 1
+    - _adjV:
+        tentativeDist: 0
+        id: 2
+        type: 0
+      _weight: 0
+    - _adjV:
+        tentativeDist: 0
+        id: 1
+        type: 0
+      _weight: 0
+  - InnerList:
+    - _adjV:
+        tentativeDist: 0
+        id: 2
+        type: 0
+      _weight: 0
+    - _adjV:
+        tentativeDist: 0
+        id: 0
+        type: 0
+      _weight: 0
+  - InnerList:
+    - _adjV:
+        tentativeDist: 0
+        id: 3
+        type: 0
+      _weight: 0
+    - _adjV:
+        tentativeDist: 0
+        id: 1
+        type: 0
+      _weight: 0
+    - _adjV:
+        tentativeDist: 0
+        id: 0
+        type: 0
+      _weight: 0
+  - InnerList:
+    - _adjV:
+        tentativeDist: 0
+        id: 4
+        type: 0
+      _weight: 0
+    - _adjV:
+        tentativeDist: 0
+        id: 2
+        type: 0
+      _weight: 0
+  - InnerList:
+    - _adjV:
+        tentativeDist: 0
+        id: 3
+        type: 0
+      _weight: 0
+    - _adjV:
+        tentativeDist: 0
+        id: 0
+        type: 0
+      _weight: 1
+  _numOVertices: 5

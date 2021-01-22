@@ -5,16 +5,27 @@ using System.Linq;
 using UnityEngine;
 
 
+[Serializable]
 [CreateAssetMenu(menuName ="Graph")]
 public class GraphSO : ScriptableObject
 {
     [HideInInspector]
-    public List<Vertex> Vertices = new List<Vertex>();
-    public List<List<Edge>> Adjacency = new List<List<Edge>>();
+    public List<Vertex> Vertices;
+    public List<ListEdgeWrapper> Adjacency;
 
     public int NumOfVertices { get => _numOVertices; set => _numOVertices = value; }
 
+    [HideInInspector]
+    [SerializeField]
     private int _numOVertices = 0;
+
+    private void OnEnable()
+    {
+        if (Vertices == null)
+            Vertices = new List<Vertex>();
+        if (Adjacency == null)
+            Adjacency = new List<ListEdgeWrapper>();
+    }
 
     #region Add Vertex/Edge
     public Vertex AddVertex()
@@ -25,7 +36,7 @@ public class GraphSO : ScriptableObject
             Type = VertexType.NONE
         };
         Vertices.Add(v);
-        Adjacency.Add(new List<Edge>());
+        Adjacency.Add(new ListEdgeWrapper());
         NumOfVertices++;
         return v;
     }
@@ -37,14 +48,14 @@ public class GraphSO : ScriptableObject
             return;
         }
 
-        Adjacency[v1.Id].RemoveAll(e => e.AdjacentV == v2);
-        Adjacency[v2.Id].RemoveAll(e => e.AdjacentV == v1);
+        Adjacency[v1.Id].InnerList.RemoveAll(e => e.AdjacentV == v2);
+        Adjacency[v2.Id].InnerList.RemoveAll(e => e.AdjacentV == v1);
 
-        Adjacency[v1.Id].Add(new Edge(v2, weight));
-        Adjacency[v2.Id].Add(new Edge(v1, weight));
+        Adjacency[v1.Id].InnerList.Add(new Edge(v2, weight));
+        Adjacency[v2.Id].InnerList.Add(new Edge(v1, weight));
 
-        Adjacency[v1.Id].Sort((x1, x2) => x2.AdjacentV.Id - x1.AdjacentV.Id);
-        Adjacency[v2.Id].Sort((x1, x2) => x2.AdjacentV.Id - x1.AdjacentV.Id);
+        Adjacency[v1.Id].InnerList.Sort((x1, x2) => x2.AdjacentV.Id - x1.AdjacentV.Id);
+        Adjacency[v2.Id].InnerList.Sort((x1, x2) => x2.AdjacentV.Id - x1.AdjacentV.Id);
     }
     #endregion
 
@@ -81,7 +92,7 @@ public class GraphSO : ScriptableObject
             if (minV.Equals(end))
                 break;
 
-            foreach (var edge in Adjacency[minV.Id])
+            foreach (var edge in Adjacency[minV.Id].InnerList)
             {
                 var v = edge.AdjacentV;
                 if (!vertexSet.Contains(v))

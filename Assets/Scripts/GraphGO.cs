@@ -18,11 +18,13 @@ public class GraphGO : MonoBehaviour
     [SerializeField]
     private GraphSO _graphToLoad = null;
 
-
-    public GraphSO Graph { get; set; }
-    public Dictionary<Vertex, VertexGO> VerticesGO { get; set; } = new Dictionary<Vertex, VertexGO>();
+    public GraphSO Graph { get => _graph; private set => _graph = value; }
+    public Dictionary<int, VertexGO> VerticesGO { get; set; } = new Dictionary<int, VertexGO>();
 
     private Vertex[] _path;
+    [HideInInspector]
+    [SerializeField]
+    private GraphSO _graph;
     #endregion
 
     #region Graph Asset Handling
@@ -59,8 +61,8 @@ public class GraphGO : MonoBehaviour
             vGO.name = v.Id.ToString();
             v.Type = VertexType.NONE;
             vGO.SetColorByType();
-            VerticesGO.Add(v, vGO);
-            vGO.EdgeGraphics.positionCount = Mathf.Max(0, Graph.Adjacency[v.Id].Count - v.Id) * 2;
+            VerticesGO.Add(v.Id, vGO);
+            vGO.EdgeGraphics.positionCount = Mathf.Max(1, Graph.Adjacency[v.Id].InnerList.Count - v.Id) * 2;
         }
     }
     private void UnloadGraph()
@@ -79,7 +81,7 @@ public class GraphGO : MonoBehaviour
     #region Add Edge/Vertex
     public void AddEdge(VertexGO v1, VertexGO v2, int weight)
     {
-        if (Graph.Adjacency[v1.Vertex.Id].Any(e => e.AdjacentV == v2.Vertex))
+        if (Graph.Adjacency[v1.Vertex.Id].InnerList.Any(e => e.AdjacentV == v2.Vertex))
         {
             Graph.AddEdge(v1.Vertex, v2.Vertex, weight);
             return;
@@ -110,7 +112,7 @@ public class GraphGO : MonoBehaviour
         var vGo = Instantiate(_vertexGraphics, transform.position + randOffset, Quaternion.identity, transform);
         vGo.Vertex = Graph.AddVertex();
         vGo.name = vGo.Vertex.Id.ToString();
-        VerticesGO.Add(vGo.Vertex, vGo);
+        VerticesGO.Add(vGo.Vertex.Id, vGo);
 
         EditorUtility.SetDirty(Graph);
         AssetDatabase.SaveAssets();
@@ -137,7 +139,7 @@ public class GraphGO : MonoBehaviour
         while (i < _path.Length)
         {
             var vertex = _path[i];
-            _pathGraphics.SetPosition(i, VerticesGO[vertex].transform.position);
+            _pathGraphics.SetPosition(i, VerticesGO[vertex.Id].transform.position);
             i++;
         }
     }
@@ -152,17 +154,18 @@ public class GraphGO : MonoBehaviour
     /// </summary>
     public void DrawEdges()
     {
-        if (Graph == null || Graph.Adjacency.All(neighbours => neighbours.Count <= 0))
+        
+        if (Graph == null || Graph.Adjacency.All(neighbours => neighbours.InnerList?.Count <= 0))
             return;
         foreach (var v in Graph.Vertices)
         {
-            var vGO = VerticesGO[v];
+            var vGO = VerticesGO[v.Id];
             int lineCount = 0;
-            foreach (var edge in Graph.Adjacency[v.Id])
+            foreach (var edge in Graph.Adjacency[v.Id].InnerList)
             {
                 if (lineCount >= vGO.EdgeGraphics.positionCount)
                     break;
-                var vNeighbourGO = VerticesGO[edge.AdjacentV];
+                var vNeighbourGO = VerticesGO[edge.AdjacentV.Id];
 
                 var neighbourPos = vNeighbourGO.transform.position;
                 vGO.EdgeGraphics.SetPosition(lineCount, neighbourPos);
