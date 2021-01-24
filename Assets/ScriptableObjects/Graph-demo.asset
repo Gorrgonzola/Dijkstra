@@ -13,85 +13,75 @@ MonoBehaviour:
   m_Name: Graph-demo
   m_EditorClassIdentifier: 
   Vertices:
-  - tentativeDist: 0
-    id: 0
+  - id: 2
+    type: 1
+  - id: 4
     type: 0
-  - tentativeDist: 0
-    id: 1
+  - id: 5
     type: 0
-  - tentativeDist: 0
-    id: 2
+  - id: 6
+    type: 2
+  - id: 8
     type: 0
-  - tentativeDist: 0
-    id: 3
-    type: 0
-  - tentativeDist: 0
-    id: 4
-    type: 0
+  - id: 9
+    type: 2
   Adjacency:
   - InnerList:
     - _adjV:
-        tentativeDist: 0
-        id: 4
-        type: 0
-      _weight: 1
-    - _adjV:
-        tentativeDist: 0
-        id: 2
-        type: 0
-      _weight: 0
-    - _adjV:
-        tentativeDist: 0
-        id: 1
-        type: 0
-      _weight: 0
-  - InnerList:
-    - _adjV:
-        tentativeDist: 0
-        id: 2
-        type: 0
-      _weight: 0
-    - _adjV:
-        tentativeDist: 0
-        id: 0
-        type: 0
-      _weight: 0
-  - InnerList:
-    - _adjV:
-        tentativeDist: 0
-        id: 3
-        type: 0
-      _weight: 0
-    - _adjV:
-        tentativeDist: 0
-        id: 1
-        type: 0
-      _weight: 0
-    - _adjV:
-        tentativeDist: 0
-        id: 0
-        type: 0
-      _weight: 0
-  - InnerList:
-    - _adjV:
-        tentativeDist: 0
         id: 4
         type: 0
       _weight: 0
+  - InnerList: []
+  - InnerList:
     - _adjV:
-        tentativeDist: 0
-        id: 2
+        id: 6
+        type: 2
+      _weight: 0
+    - _adjV:
+        id: 5
         type: 0
+      _weight: 0
+  - InnerList: []
+  - InnerList:
+    - _adjV:
+        id: 5
+        type: 0
+      _weight: 10
+  - InnerList:
+    - _adjV:
+        id: 4
+        type: 0
+      _weight: 10
+    - _adjV:
+        id: 2
+        type: 1
       _weight: 0
   - InnerList:
     - _adjV:
-        tentativeDist: 0
-        id: 3
+        id: 8
         type: 0
       _weight: 0
     - _adjV:
-        tentativeDist: 0
-        id: 0
+        id: 2
+        type: 1
+      _weight: 0
+  - InnerList:
+    - _adjV:
+        id: 2
+        type: 1
+      _weight: 0
+  - InnerList:
+    - _adjV:
+        id: 9
+        type: 2
+      _weight: 0
+    - _adjV:
+        id: 6
+        type: 2
+      _weight: 0
+  - InnerList:
+    - _adjV:
+        id: 8
         type: 0
-      _weight: 1
-  _numOVertices: 5
+      _weight: 0
+  _numOVertices: 10

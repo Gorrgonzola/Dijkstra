@@ -77,12 +77,7 @@ public class GraphGOEditor : Editor
 
         if (GUILayout.Button("Find Shortest Path"))
         {
-            var path = graph.FindShortestPath(_start, _end);
-
-            if (path != null)
-            {
-                graph.SetShortestPath(path);
-            }
+            graph.FindShortestPath(_start, _end);
         }
     }
 }

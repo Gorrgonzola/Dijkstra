@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 
 [Serializable]
-[CreateAssetMenu(menuName ="Graph")]
+[CreateAssetMenu(menuName = "Graph")]
 public class GraphSO : ScriptableObject
 {
     [HideInInspector]
@@ -65,65 +64,73 @@ public class GraphSO : ScriptableObject
     /// <param name="start">Source</param>
     /// <param name="end">Destination</param>
     /// <returns>Vertex path from start to end.</returns>
-    public Stack<Vertex> FindShortestPath(Vertex start, Vertex end)
+    public Vertex[] FindShortestPath(Vertex start, Vertex end)
     {
-        HashSet<Vertex> vertexSet = new HashSet<Vertex>();
-        Dictionary<Vertex, Vertex> prevVertex = new Dictionary<Vertex, Vertex>();
+        HashSet<int> unvisited = new HashSet<int>();
+        Dictionary<int, int> prevVertex = new Dictionary<int, int>();
+        Dictionary<int, float> tentativeDistances = new Dictionary<int, float>();
 
-        start.TentativeDist = 0;
-        prevVertex.Add(start, null);
-        vertexSet.Add(start);
+        tentativeDistances.Add(start.Id, 0);
+        prevVertex.Add(start.Id, -1);
+        unvisited.Add(start.Id);
 
         foreach (var vertex in Vertices)
         {
             if (vertex.Equals(start))
                 continue;
-            vertex.TentativeDist = Mathf.Infinity;
-            prevVertex.Add(vertex, null);
-            vertexSet.Add(vertex);
+            tentativeDistances.Add(vertex.Id, Mathf.Infinity);
+            prevVertex.Add(vertex.Id, -1);
+            unvisited.Add(vertex.Id);
         }
 
-        Vertex minV = null;
-        while (vertexSet.Count > 0)
+        int minId = -1;
+        while (unvisited.Count > 0)
         {
-            minV = vertexSet.Aggregate((curMin, v) => curMin.TentativeDist < v.TentativeDist ? curMin : v);
-            vertexSet.Remove(minV);
+            minId = unvisited.Aggregate((curMin, v) => tentativeDistances[curMin] < tentativeDistances[v] ? curMin : v);
+            unvisited.Remove(minId);
 
-            if (minV.Equals(end))
+
+            if (minId.Equals(end.Id))
                 break;
 
-            foreach (var edge in Adjacency[minV.Id].InnerList)
+            foreach (var edge in Adjacency[minId].InnerList)
             {
-                var v = edge.AdjacentV;
-                if (!vertexSet.Contains(v))
-                    continue;
-                var dist = minV.TentativeDist + edge.Weight;
-                if (dist < v.TentativeDist)
+                var adjV = edge.AdjacentV;
+                if (!unvisited.Contains(adjV.Id))
                 {
-                    v.TentativeDist = dist;
-                    prevVertex[v] = minV;
+                    continue;
+                }
+                var dist = tentativeDistances[minId] + edge.Weight;
+                if (dist < tentativeDistances[adjV.Id])
+                {
+                    tentativeDistances[adjV.Id] = dist;
+                    prevVertex[adjV.Id] = minId;
                 }
             }
-
-            
         }
 
-        var stack = new Stack<Vertex>();
-        if (prevVertex[minV] == null || minV.Equals(start))
+        if (prevVertex[minId] == -1 || minId.Equals(start.Id))
         {
             Debug.LogWarning("Couldn't find traversable path from end to start");
             return null;
         }
-        while (minV != null)
+        var path = new Stack<Vertex>();
+        while (minId != -1)
         {
-            stack.Push(minV);
-            minV = prevVertex[minV];
+            var minV = Vertices.Find(v => v.Id.Equals(minId));
+            path.Push(minV);
+            minId = prevVertex[minId];
         }
 
-        return stack;
+        return path.ToArray();
     }
 
     #region Deletion
+    public void DeleteVertex(Vertex v)
+    {
+        Adjacency.ForEach(neighbours => neighbours.InnerList.RemoveAll(edge => edge.AdjacentV.Id.Equals(v.Id)));
+        Vertices.Remove(v);
+    }
     public void DeleteAllVertices()
     {
         NumOfVertices = 0;

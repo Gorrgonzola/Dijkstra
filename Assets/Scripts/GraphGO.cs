@@ -144,11 +144,6 @@ public class GraphGO : MonoBehaviour
         }
     }
 
-    public void SetShortestPath(Stack<Vertex> path)
-    {
-        _path = path.ToArray();
-    }
-
     /// <summary>
     /// Draws(badly) lines using LineRenderer(LR). Every even point in a LR is a transform.position
     /// </summary>
@@ -176,6 +171,15 @@ public class GraphGO : MonoBehaviour
     }
     #endregion
 
+    #region Deletion
+    public void DeleteVertex(VertexGO vGO)
+    {
+        VerticesGO.Remove(vGO.Vertex.Id);
+        vGO.EdgeGraphics.positionCount = 0;
+        DestroyImmediate(vGO.gameObject);
+        Graph.DeleteVertex(vGO.Vertex);
+    }
+
     public void DeleteAllVertices()
     {
         if (Graph == null)
@@ -190,9 +194,14 @@ public class GraphGO : MonoBehaviour
 
         Graph.DeleteAllVertices();
     }
+    #endregion
 
-    public Stack<Vertex> FindShortestPath(VertexGO start, VertexGO end)
+    public void FindShortestPath(VertexGO start, VertexGO end)
     {
-        return Graph.FindShortestPath(start.Vertex, end.Vertex);
+        var path = Graph.FindShortestPath(start.Vertex, end.Vertex);
+        if (path != null)
+        {
+            _path = path;
+        }
     }
 }
